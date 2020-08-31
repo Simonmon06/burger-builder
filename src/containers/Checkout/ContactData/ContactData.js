@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import {connect} from "react-redux";
 import Button from "../../../components/UI/Button/Button";
 import classes from './ContactData.module.css'
 import axiosInstance from "../../../axiosInstance";
@@ -119,7 +120,7 @@ class ContactData extends Component{
             formData[formElementIdentifier] = this.state.orderForm[formElementIdentifier].value;
         }
         const order ={
-            ingredients: this.props.ingredients,
+            ingredients: this.props.ings,
             price: this.props.price,
             orderData: formData
         }
@@ -134,39 +135,37 @@ class ContactData extends Component{
                 console.log(error)});
     }
 
-    inputChangedHandler=(event,inputIdentifier)=>{
-        const updatedOrderForm ={
+    inputChangedHandler = (event, inputIdentifier) => {
+        const updatedOrderForm = {
             ...this.state.orderForm
-            // its not a deep copy
-        }
-        const updatedFormElement={
+        };
+        const updatedFormElement = {
             ...updatedOrderForm[inputIdentifier]
-        }
+        };
         updatedFormElement.value = event.target.value;
-        updatedFormElement.valid = this.checkValidity(updatedFormElement.value,updatedFormElement.validation);
+        updatedFormElement.valid = this.checkValidity(updatedFormElement.value, updatedFormElement.validation);
         updatedFormElement.touched = true;
         updatedOrderForm[inputIdentifier] = updatedFormElement;
 
-        let formIsValid = false;
+        let formIsValid = true;
         for(let inputIdentifier in updatedOrderForm){
             formIsValid = updatedOrderForm[inputIdentifier].valid && formIsValid
         }
         this.setState({orderForm : updatedOrderForm, formIsValid: formIsValid})
     }
 
-    render(){
-        const formElementsArray=[];
-        for(let key in this.state.orderForm){
+    render () {
+        const formElementsArray = [];
+        for (let key in this.state.orderForm) {
             formElementsArray.push({
-                id:key,
-                config:this.state.orderForm[key]
-            })
+                id: key,
+                config: this.state.orderForm[key]
+            });
         }
-        let form =(
+        let form = (
             <form onSubmit={this.orderHandler}>
                 {formElementsArray.map(formElement => (
                     <Input
-
                         key={formElement.id}
                         elementType={formElement.config.elementType}
                         elementConfig={formElement.config.elementConfig}
@@ -174,23 +173,31 @@ class ContactData extends Component{
                         invalid={!formElement.config.valid}
                         shouldValidate={formElement.config.validation}
                         touched={formElement.config.touched}
-                        changed={(event,) => this.inputChangedHandler(event,formElement.id)
-                        }
-                    />
+                        changed={(event) => this.inputChangedHandler(event, formElement.id)} />
                 ))}
-            <Button btnType="Success" disabled={!this.state.formIsValid} clicked={this.orderHandler}>ORDER</Button>
-        </form>
+                <Button btnType="Success" disabled={!this.state.formIsValid}>ORDER</Button>
+            </form>
         );
-        if(this.state.loading){
-            form= <Spinner/>
+        if ( this.state.loading ) {
+            form = <Spinner />;
         }
-        return(
+        return (
             <div className={classes.ContactData}>
-                <h4>Enter your Contact Data </h4>
+                <h4>Enter your Contact Data</h4>
                 {form}
             </div>
         );
     }
 }
 
-export default ContactData;
+
+
+const mapStateToProps = state => {
+    return {
+        ings: state.ingredients,
+        price: state.totalPrice
+    }
+};
+
+
+export default connect(mapStateToProps)(ContactData);
