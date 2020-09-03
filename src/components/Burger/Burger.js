@@ -7,6 +7,7 @@ const Burger = (props) =>{
     //Object.keys(object) return a array of all the keys of the input parameter object
     //igKey is the each element of the input array
     //Array(): Array(3) gives you an  array with size of 3 [, , ,]
+    console.log('the ingredients : ', props.ingredients)
     let transformedIngredients = Object.keys(props.ingredients)
         .map(igKey =>{
             return [...Array(props.ingredients[igKey])].map(( _, i ) =>{
